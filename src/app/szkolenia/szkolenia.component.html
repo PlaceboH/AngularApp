@@ -1,0 +1,37 @@
+
+<div class="card">
+    <h4 class="card-header">Zrób swoje szkolenie</h4>
+    <div class="card-body">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" >
+            <div class="form-group">
+                <label for="Nazwa"> Nazwa szkolenia </label>
+                <input type="text" formControlName="Nazwa" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Nazwa.errors }" />
+                <div *ngIf="submitted && f.Nazwa.errors" class="invalid-feedback">
+                    <div *ngIf="f.Nazwa.errors.required">Podaj nazwę szkolenia</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Data"> Data rozpoczęcia</label>
+                <input type="text" formControlName="Data" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Data.errors }"  />
+                <div *ngIf="submitted && f.Data.errors" class="invalid-feedback">
+                    <div *ngIf="f.Data.errors.required">podaj date szkolenia</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Opis"> Opis Szkolenia </label>
+                <input type="text" formControlName="Opis" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.Opis.errors }"  />
+                <div *ngIf="submitted && f.Opis.errors" class="invalid-feedback">
+                    <div *ngIf="f.Opis.errors.required">Opisz szkolenie</div>
+                    <div *ngIf="f.password.errors.minlength">Za krótki opis </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button  class="btn btn-primary">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    Dodaj
+                </button>
+                <a routerLink="/acc" class="btn btn-link">Wróć</a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+<h1>Szkolenia</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th style="width: 20%">Nazwa</th>
+            <th style="width: 20%">Data</th>
+            <th style="width: 30%">Opis</th>
+            <th style="width: 20%">Twórca</th>
+            <th style="width: 10%"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let szkol of szkolenia">
+            <td>{{szkol.Nazwa}}</td>
+            <td>{{szkol.Data}}</td>
+            <td>{{szkol.Opis}}</td>
+            <td>{{szkol.Tworca}}</td>
+            <td style="white-space: nowrap">
+                <a class="btn btn-sm btn-primary mr-1"> Subskrybuj</a>
+            </td>
+        </tr>
+        <tr *ngIf="!szkolenia">
+            <td colspan="4" class="text-center">
+                <span class="spinner-border spinner-border-lg align-center"></span>
+            </td>
+        </tr>
+    </tbody>
+</table>
