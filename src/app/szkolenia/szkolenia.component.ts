@@ -1,67 +1,82 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { AccountService } from '../control-system/account.system';
 import { AlertService } from '../control-system/alert.system';
 import { Szkolenie } from '../structures/szkolenie';
-import { User } from '../structures/user';
 
 @Component({
   selector: 'app-szkolenia',
   templateUrl: './szkolenia.component.html'
 })
 export class SzkoleniaComponent implements OnInit {
-  form: FormGroup;
-  loading = false;
+  szkolenie = null;
+  id: string;
   submitted = false;
-  user : User;
-  constructor( 
+  loading = false;
+  isSubscribe:boolean = false;
+
+  constructor(       
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private accountService: AccountService,
-    private alertService: AlertService
-  ){}
+    private alertService: AlertService) { }
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      Nazwa: ['', Validators.required],
-      Data: ['', Validators.required],
-      Opis: ['', [Validators.required, Validators.minLength(10)]]
-  });
+    this.id = this.route.snapshot.params['id'];
+    this.accountService.getSzkolenieById(this.id).pipe(first()).subscribe(x => {
+      this.szkolenie = x;
+    });;
+
+    console.table(this.szkolenie);
   }
 
-  get f() { return this.form.controls; }
-  
 
   onSubmit() {
-
     this.submitted = true;
 
     // reset alerts on submit
     this.alertService.clear();
 
-    // stop here if form is invalid
-    if (this.form.invalid) {
-        return;
-    }
 
+    //this.loading = true;
     this.loading = true;
-    this.accountService.registerSzkolenie(this.form.value)
-        .pipe(first())
-        .subscribe(
-            data => {
-                this.alertService.success('Dodano Szkolenie!', { keepAfterRouteChange: true });
-                this.router.navigate(['../acc'], { relativeTo: this.route });
-            },
-            error => {
-                this.alertService.error(error);
-                this.loading = false;
-            });
 
+
+  //   this.accountService.updateSzkolenie(this.id, this.szkolenie)
+  //   .pipe(first())
+  //   .subscribe(
+  //       data => {
+  //           this.alertService.success('Update successful', { keepAfterRouteChange: true });
+  //           this.router.navigate(['..', { relativeTo: this.route }]);
+  //       },
+  //       error => {
+  //           this.alertService.error(error);
+  //           this.loading = false;
+  //       });
+  }
+
+
+  Sub(){
+    let username = this.accountService.userValue.username;
+    this.szkolenie.subscribe.push(username);
+    this.isSubscribe = true;
+    console.table(this.szkolenie);
+  }
+
+  unSub(){
+    let username = this.accountService.userValue.username;
+    let index = this.szkolenie.subscribe.indexOf(username);
+    delete this.szkolenie.subscribe[index];
+    this.isSubscribe = false;
+    console.table(this.szkolenie);
   }
 
 
 }
-  
+
+
+
+

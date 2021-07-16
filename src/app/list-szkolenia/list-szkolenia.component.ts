@@ -7,17 +7,16 @@ import { AccountService } from '../control-system/account.system';
   templateUrl: './list-szkolenia.component.html'
 })
 export class ListSzkoleniaComponent implements OnInit {
-
   szkolenia = null;
 
   constructor(private accountService: AccountService) {}
 
   ngOnInit() {
-
       this.accountService.getAllSzkolenia()
           .pipe(first())
           .subscribe(szkolenia => this.szkolenia = szkolenia);
   }
 
-
 }
+
+

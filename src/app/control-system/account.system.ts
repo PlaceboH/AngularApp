@@ -35,7 +35,6 @@ export class AccountService {
     login(username, password) {
         return this.http.post<User>(`${environment.apiUrl}/acc`, { username, password })
             .pipe(map(user => {
-                // store user details and jwt token in local storage to keep user logged in between page refreshes
                 localStorage.setItem('user', JSON.stringify(user));
                 this.userSubject.next(user);
                 return user;
@@ -43,7 +42,6 @@ export class AccountService {
     }
 
     logout() {
-        // remove user from local storage and set current user to null
         localStorage.removeItem('user');
         this.userSubject.next(null);
         this.router.navigate(['/log']);
@@ -53,8 +51,13 @@ export class AccountService {
     register(user: User) {
         return this.http.post(`${environment.apiUrl}/reg`, user);
     }
-    registerSzkolenie(szkolenie: Szkolenie) {
+    registerSzkolenie(szkolenie: Szkolenie, name : string ) {
+        szkolenie.tworca = name;
         return this.http.post(`${environment.apiUrl}/szkolenia`, szkolenie);
+    }
+    
+    subskrybujSzkolenie(userId : string){
+        return this.http.post(`${environment.apiUrl}/lista`, userId);
     }
     getUsersAll() {
         return this.http.get<User[]>(`${environment.apiUrl}/users`);
@@ -66,30 +69,39 @@ export class AccountService {
     getById(id: string) {
         return this.http.get<User>(`${environment.apiUrl}/users/${id}`);
     }
-    getUsersById(id: string) {
-        return this.http.get<User>(`${environment.apiUrl}/users/${id}`);
+    getSzkolenieById(id: string) {
+        return this.http.get<Szkolenie>(`${environment.apiUrl}/szkolenie/${id}`);
     }
 
     update(id, params) {
         return this.http.put(`${environment.apiUrl}/users/${id}`, params)
             .pipe(map(x => {
-                // update stored user if the logged in user updated their own record
                 if (id == this.userValue.id) {
-                    // update local storage
                     const user = { ...this.userValue, ...params };
                     localStorage.setItem('user', JSON.stringify(user));
 
-                    // publish updated user to subscribers
                     this.userSubject.next(user);
                 }
                 return x;
             }));
     }
 
+    updateSzkolenie(id, szkol: Szkolenie){
+        return this.http.put(`${environment.apiUrl}/szkolenie/${id}`, szkol)
+        .pipe(map(x => {
+            if (id == this.userValue.id) {
+                const szkolenie = { ...this.szkolenieValue, ...szkol };
+                localStorage.setItem('szkolenie', JSON.stringify(szkolenie));
+
+                this.szkolenieSubject.next(szkolenie);
+            }
+            return x;
+        }));
+    }
+
     delete(id: string) {
         return this.http.delete(`${environment.apiUrl}/users/${id}`)
             .pipe(map(x => {
-                // auto logout if the logged in user deleted their own record
                 if (id == this.userValue.id) {
                     this.logout();
                 }

@@ -1,9 +1,9 @@
 export class Szkolenie {
     id: string ;
     data : string;
-    name: string ;
-    opis: string ;
+    Nazwa: string ;
+    Opis: string ;
     tworca : string;
-    subskrybcje : string[];
+    subskrybcje : string[]  = ["adam"];
     token: string ;
 }

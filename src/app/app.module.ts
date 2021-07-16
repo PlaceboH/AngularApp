@@ -15,6 +15,10 @@ import { ListSzkoleniaComponent } from './list-szkolenia/list-szkolenia.componen
 import { UserManagComponent } from './user-manag/user-manag.component';
 import { EditUserManagComponent } from './edit-user-manag/edit-user-manag.component';
 import { CommentsComponent } from './comments/comments.component';
+import { CommentBoxComponent } from './comment-box/comment-box.component';
+import { AddSzkolenieComponent } from './add-szkolenie/add-szkolenie.component';
+import { LayerComponent } from './layer/layer.component';
+import { MySzkoleniaComponent } from './my-szkolenia/my-szkolenia.component';
 
 
 @NgModule({
@@ -28,7 +32,11 @@ import { CommentsComponent } from './comments/comments.component';
     ListSzkoleniaComponent,
     UserManagComponent,
     EditUserManagComponent,
-    CommentsComponent
+    CommentsComponent,
+    CommentBoxComponent,
+    AddSzkolenieComponent,
+    LayerComponent,
+    MySzkoleniaComponent
 
   ],
   imports: [

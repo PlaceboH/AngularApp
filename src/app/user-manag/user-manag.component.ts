@@ -16,6 +16,8 @@ export class UserManagComponent implements OnInit {
       this.accountService.getUsersAll()
           .pipe(first())
           .subscribe(users => this.users = users);
+      
+    console.table(this.users[0]);
   }
 
   deleteUser(id: string) {

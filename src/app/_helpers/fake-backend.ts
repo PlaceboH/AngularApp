@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpRequest, HttpResponse, HttpHandler, HttpEvent, HttpInterceptor, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, mergeMap, materialize, dematerialize } from 'rxjs/operators';
+import { Szkolenie } from '../structures/szkolenie';
 
 // array in local storage for registered users
 let users = JSON.parse(localStorage.getItem('users')) || [];
@@ -15,8 +16,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         // wrap in delayed observable to simulate server api call
         return of(null)
             .pipe(mergeMap(handleRoute))
-            .pipe(materialize()) // call materialize and dematerialize to ensure delay even if an error is thrown (https://github.com/Reactive-Extensions/RxJS/issues/648)
-            .pipe(delay(500))
+            .pipe(materialize()) 
             .pipe(dematerialize());
 
         function handleRoute() {
@@ -29,14 +29,19 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     return addSzkolenie();
                 case url.endsWith('/users') && method === 'GET':
                     return getUsers();
+                case url.match('/lista') && method === 'POST':
+                    return subscribeSzkolenie();
                 case url.endsWith('/lista') && method === 'GET':
-                    return getSzkolenia();
-                case url.match('/lista') && method === 'GET':
-                    return getUserById();
+                    return getSzkolenia();  
                 case url.match(/\/users\/\d+$/) && method === 'PUT':
                     return updateUser();
+                case url.match(/\/users\/\d+$/) && method === 'GET':
+                    return getUserById();
                 case url.match(/\/users\/\d+$/) && method === 'DELETE':
                     return deleteUser();
+
+                case url.match(/\/szkolenie\/\d+$/) && method === 'GET':
+                    return getSzkolenieById();
                 default:
                     // pass through any requests not handled above
                     return next.handle(request);
@@ -75,11 +80,20 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function addSzkolenie(){
             const szkolenie = body;
-            // const user = body
-            szkolenie.id = szkolenia.length;
-            szkolenie.tworca = 'Adam';  
+            console.table(body);
+            szkolenie.id = szkolenia.length ? Math.max(...szkolenia.map(x => x.id)) + 1 : 1;;
+            szkolenie.tworca = body.tworca;
+            szkolenie.subscribe = [szkolenie.tworca];  
             szkolenia.push(szkolenie);
             localStorage.setItem('szkolenia', JSON.stringify(szkolenia));
+            return ok();
+        }
+
+        function subscribeSzkolenie(){
+            console.log(body);
+            const szkolenie = szkolenia.find(x => x.name = body.Nazwa);
+            
+            console.log(szkolenie.id + 'hi');
             return ok();
         }
 
@@ -94,23 +108,26 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         }
         function getUserById() {
             if (!isLoggedIn()) return unauthorized();
-
             const user = users.find(x => x.id === idFromUrl());
             return ok(user);
         }
 
+        function getSzkolenieById() {
+            if (!isLoggedIn()) return unauthorized();
+            const szkolenie = szkolenia.find(x => x.id === idFromUrl());
+            return ok(szkolenie);
+        }
+
         function updateUser() {
+            console.log("Hi");
             if (!isLoggedIn()) return unauthorized();
 
             let params = body;
             let user = users.find(x => x.id === idFromUrl());
 
-            // only update password if entered
             if (!params.password) {
                 delete params.password;
             }
-
-            // update and save user
             Object.assign(user, params);
             localStorage.setItem('users', JSON.stringify(users));
 
@@ -144,7 +161,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return ok();
         }
 
-        // helper functions
+
 
         function ok(body?) {
             return of(new HttpResponse({ status: 200, body }))
@@ -170,7 +187,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 }
 
 export const fakeBackendProvider = {
-    // use fake backend in place of Http service for backend-less development
+
     provide: HTTP_INTERCEPTORS,
     useClass: FakeBackendInterceptor,
     multi: true
